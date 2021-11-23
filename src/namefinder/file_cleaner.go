@@ -26,7 +26,7 @@ func CleanNames(inputFileFullPath string, outputFileFullPath string) {
 	for scanner.Scan() {
 		data := scanner.Text()
 		splittedData := strings.Split(string(data), ";")
-		name := splittedData[1]
+		name := util.ReplaceSpecialChars(splittedData[1])
 		nb, _ := strconv.Atoi(splittedData[3])
 
 		names[name] += nb
@@ -65,7 +65,7 @@ func CleanFilterCities(inputFileFullPath string, outputFileFullPath string) {
 	scanner := bufio.NewScanner(inputFile)
 	for scanner.Scan() {
 		data := scanner.Text()
-		city := strings.Split(data, ",")[1]
+		city := util.ReplaceSpecialChars(strings.Split(data, ",")[1])
 
 		citySplitted := strings.Split(city, " ")
 
