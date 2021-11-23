@@ -2,8 +2,11 @@ package namefinder
 
 import (
 	"bufio"
+	"file/src/util"
 	"log"
 	"os"
+	"strconv"
+	"strings"
 )
 
 func Match(inputFileFullPath1 string, inputFileFullPath2 string, outputFileFullPath string) {
@@ -12,10 +15,13 @@ func Match(inputFileFullPath1 string, inputFileFullPath2 string, outputFileFullP
 		log.Fatal(err1)
 	}
 	defer inputFile1.Close()
-	var names []string
+	names := make(map[string]int)
 	scanner1 := bufio.NewScanner(inputFile1)
 	for scanner1.Scan() {
-		names = append(names, scanner1.Text())
+		line := scanner1.Text()
+		splittedLine := strings.Split(line, ";")
+		nb, _ := strconv.Atoi(splittedLine[1])
+		names[splittedLine[0]] = nb
 	}
 
 	inputFile2, err2 := os.Open(inputFileFullPath2)
@@ -34,13 +40,15 @@ func Match(inputFileFullPath1 string, inputFileFullPath2 string, outputFileFullP
 		log.Fatal(err3)
 	}
 
-	for i := 0; i < len(names); i++ {
+	sortedNames := util.RankByWordCount(names)
+
+	for i := 0; i < len(sortedNames); i++ {
 		for j := 0; j < len(cities); j++ {
-			if names[i] == cities[j] {
+			if sortedNames[i].Key == cities[j] {
 				if j > 0 {
 					outputFile.Write([]byte("\n"))
 				}
-				_, err4 := outputFile.Write([]byte(names[i]))
+				_, err4 := outputFile.Write([]byte(sortedNames[i].Key + ";" + strconv.Itoa(sortedNames[i].Value)))
 				if err4 != nil {
 					log.Fatal(err4)
 				}

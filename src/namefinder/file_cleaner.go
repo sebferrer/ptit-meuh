@@ -5,6 +5,7 @@ import (
 	"file/src/util"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -20,25 +21,27 @@ func CleanNames(inputFileFullPath string, outputFileFullPath string) {
 		log.Fatal(err2)
 	}
 
-	var names []string
+	names := make(map[string]int)
 	scanner := bufio.NewScanner(inputFile)
 	for scanner.Scan() {
 		data := scanner.Text()
-		data = strings.Split(string(data), ";")[1]
+		splittedData := strings.Split(string(data), ";")
+		name := splittedData[1]
+		nb, _ := strconv.Atoi(splittedData[3])
 
-		if !util.Contains(names, data) {
-			names = append(names, data)
-		}
+		names[name] += nb
 	}
 
-	for i := 0; i < len(names); i++ {
+	i := 0
+	for key, value := range names {
 		if i > 0 {
 			outputFile.Write([]byte("\n"))
 		}
-		_, err2 := outputFile.Write([]byte(names[i]))
+		_, err2 := outputFile.Write([]byte(key + ";" + strconv.Itoa(value)))
 		if err2 != nil {
 			log.Fatal(err2)
 		}
+		i++
 	}
 
 	if err := scanner.Err(); err != nil {
